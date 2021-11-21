@@ -13,6 +13,8 @@ fi
 OVER=0
 GAME_MODE=1
 COUNTER=0
+SAVE_FILE_NAME=""
+ERROR_FILE_MESSAGE=0
 
 function draw_board {
     for A in {0..2}
@@ -46,11 +48,57 @@ function make_move_player {
     while [ true ]
     do
         clear
-        echo "Player ${PLAYER}, please make your move (input available number 1-9)"
+        echo "Player ${PLAYER}, please make your move (input available number 1-9). You can also save the game with S, or LOAD the game with L"
+        if [ ${ERROR_FILE_MESSAGE} != 0 ]
+        then
+            echo "There is no save file for this game mode"
+            ERROR_FILE_MESSAGE=0
+        fi
         echo
         draw_board
         echo
         read FIELD
+        if [ ${FIELD} == "S" ]
+        then
+            if [ ${GAME_MODE} == 1 ] 
+            then
+                SAVE_FILE_NAME="./saveFileSingle.txt"
+            else
+                SAVE_FILE_NAME="./saveFileMulti.txt"
+            fi
+            echo ${BOARD[0]} > ${SAVE_FILE_NAME}
+            for A in {1..8}
+            do
+                echo ${BOARD[$A]} >> ${SAVE_FILE_NAME}
+            done
+            echo ${PLAYER} >> ${SAVE_FILE_NAME}
+            continue
+        fi
+        if [ ${FIELD} == "L" ]
+        then
+            if [ ${GAME_MODE} == 1 ] 
+            then
+                SAVE_FILE_NAME="./saveFileSingle.txt"
+            else
+                SAVE_FILE_NAME="./saveFileMulti.txt"
+            fi
+            if [ -e ${SAVE_FILE_NAME} ]; then
+                COUNTER=0
+                for WERS in $(cat ${SAVE_FILE_NAME})
+                do
+                    if [ ${COUNTER} == 9 ]
+                    then
+                        PLAYER=$WERS
+                        continue
+                    fi
+                    BOARD[$COUNTER]=$WERS
+                    COUNTER=`expr $COUNTER + 1`
+                done
+            else
+                ERROR_FILE_MESSAGE=1
+            fi
+            continue
+        fi
         FIELD=$((FIELD-1))
         if [[ FIELD -le 8 && FIELD -ge 0 && ${BOARD[$FIELD]} != "X" && ${BOARD[$FIELD]} != "O" ]]
         then
