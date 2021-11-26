@@ -176,7 +176,7 @@ function check_winner {
         echo "Draw, nobody won"
     fi
 }
-
+clear
 echo "Welcome to Tic Tac Toe!
 In sigleplayer, your sign is always \"X\"
 Do you want to play singleplayer(1) or multiplayer(2)? Please input corresponding number"
